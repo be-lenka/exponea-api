@@ -1,0 +1,8 @@
+composer.phar
+.idea/
+/vendor/
+.env
+.phpunit.result.cache
+.vscode/
+/nbproject/*
+docs/*
