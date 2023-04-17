@@ -10,10 +10,13 @@ use belenka\ExponeaApi\Exception\Internal\MissingResponseFieldException;
 use belenka\ExponeaApi\Exception\UnexpectedResponseSchemaException;
 use belenka\ExponeaApi\Interfaces\CatalogInterface;
 use belenka\ExponeaApi\Interfaces\CatalogItemInterface;
+use belenka\ExponeaApi\Interfaces\CreateCatalogInterface;
 use belenka\ExponeaApi\Traits\ApiContainerTrait;
 use belenka\ExponeaApi\Catalog\Response\CatalogName;
 use belenka\ExponeaApi\Catalog\Response\CatalogItem;
 use belenka\ExponeaApi\Catalog\Response\CatalogItems;
+use belenka\ExponeaApi\Catalog\Response\CreateCatalog;
+use belenka\ExponeaApi\Catalog\Response\AllCatalogs;
 
 /**
  * Methods contained inside Catalog API
@@ -26,6 +29,32 @@ class Methods
     protected function getMethodUri(string $method): string
     {
         return '/data/v2/projects/' . $this->getClient()->getProjectToken() . $method;
+    }
+
+    /**
+     * Get all catalogs
+     *
+     * Promise resolves to Response\AllCatalogs object
+     * @return PromiseInterface
+     */
+    public function getAllCatalogs(): PromiseInterface
+    {
+        $request = new Request(
+            'GET',
+            '/data/v2/projects/{projectToken}/catalogs'
+        );
+        return $this->getClient()->call($request)->then(function (ResponseInterface $response) use ($request) {
+            try {
+                return new AllCatalogs(json_decode($response->getBody()->getContents(), true));
+            } catch (MissingResponseFieldException $e) {
+                throw new UnexpectedResponseSchemaException(
+                    $e->getMessage(),
+                    $request,
+                    $response,
+                    $e
+                );
+            }
+        });
     }
 
     /**
@@ -102,6 +131,36 @@ class Methods
         return $this->getClient()->call($request)->then(function (ResponseInterface $response) use ($request) {
             try {
                 return new CatalogItem(json_decode($response->getBody()->getContents(), true));
+            } catch (MissingResponseFieldException $e) {
+                throw new UnexpectedResponseSchemaException(
+                    $e->getMessage(),
+                    $request,
+                    $response,
+                    $e
+                );
+            }
+        });
+    }
+
+    /**
+     * Create catalog
+     *
+     * Promise resolves to Response\CreateCatalog object
+     * @param CreateCatalogInterface $catalog
+     * @return PromiseInterface
+     */
+    public function createCatalog(CreateCatalogInterface $catalog): PromiseInterface
+    {
+        $request = new Request(
+            'POST',
+            '/data/v2/projects/{projectToken}/catalogs',
+            [],
+            json_encode($catalog) ?: '{}'
+        );
+        
+        return $this->getClient()->call($request)->then(function (ResponseInterface $response) use ($request) {
+            try {
+                return new CreateCatalog(json_decode($response->getBody()->getContents(), true));
             } catch (MissingResponseFieldException $e) {
                 throw new UnexpectedResponseSchemaException(
                     $e->getMessage(),
