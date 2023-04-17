@@ -48,7 +48,7 @@ class CreateCatalog implements CreateCatalogInterface, JsonSerializable
         $this->fields = $fields;
     }
 
-    public function getName(): int
+    public function getName(): string
     {
         return $this->name;
     }
