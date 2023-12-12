@@ -21,6 +21,10 @@ class RegisteredCustomer implements CustomerIdInterface
     /**
      * @var string
      */
+    protected $cookie = null;
+    /**
+     * @var string
+     */
     protected $registeredKey = 'registered';
     
     /** @param array<string,string>|null $softIDs */
@@ -47,7 +51,12 @@ class RegisteredCustomer implements CustomerIdInterface
 
     public function getCookie()
     {
-        return null;
+        return $this->cookie;
+    }
+
+    public function setCookie($value)
+    {
+        $this->cookie = $value;
     }
 
     /**
